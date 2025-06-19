@@ -4,28 +4,35 @@ import tweepy
 import time
 import random
 import pytz
+import requests
+from requests.auth import HTTPBasicAuth
 from dotenv import load_dotenv
 from datetime import datetime
 import os
 
 load_dotenv()
 
-# --- OpenAI API 키 설정 ---
+# --- OpenAI API Key Setting ---
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-# --- X API 키 설정 ---
-TW_API_KEY = os.getenv("TW_API_KEY")
-TW_API_SECRET = os.getenv("TW_API_SECRET")
-TW_ACCESS_TOKEN = os.getenv("TW_ACCESS_TOKEN")
-TW_ACCESS_SECRET = os.getenv("TW_ACCESS_SECRET")
+# --- X OAuth2 Authentication Info ---
+CLIENT_ID = os.getenv("TW_CLIENT_ID")
+CLIENT_SECRET = os.getenv("TW_CLIENT_SECRET")
 
-# --- 인증 ---
-auth = tweepy.OAuth1UserHandler(TW_API_KEY, TW_API_SECRET, TW_ACCESS_TOKEN, TW_ACCESS_SECRET)
-api = tweepy.API(auth)
-openai.api_key = OPENAI_API_KEY
-
-# --- 타임존 설정 ---
+# --- timezone setting ---
 korea = pytz.timezone("Asia/Seoul")
+
+BEARER_TOKEN = os.getenv("TW_BEARER_TOKEN")
+# --- tweepy 클라이언트 생성 ---
+client = tweepy.Client(bearer_token=BEARER_TOKEN)
+
+auth = tweepy.OAuth1UserHandler(
+    os.getenv("TW_API_KEY"),
+    os.getenv("TW_API_SECRET"),
+    os.getenv("TW_ACCESS_TOKEN"),
+    os.getenv("TW_ACCESS_SECRET")
+)
+api = tweepy.API(auth)
 
 # --- 프롬프트 스타일 (정보형, 공감형, 유머형) ---
 def make_prompt_style(style, user_id, comment):
@@ -83,22 +90,22 @@ def generate_gpt_reply(user_id, comment):
 # --- 댓글 응답 처리 ---
 REPLIED_IDS = set()
 
-def reply_to_mentions():
-    try:
-        mentions = api.mentions_timeline(count=5)
-        for mention in mentions:
-            if mention.id not in REPLIED_IDS:
-                # 댓글이 처음 본 것이라면만 GPT 호출
-                reply_text = generate_gpt_reply(mention.user.screen_name, mention.text)
-                if reply_text:
-                    api.update_status(
-                        status=f"@{mention.user.screen_name} {reply_text}",
-                        in_reply_to_status_id=mention.id
-                    )
-                    REPLIED_IDS.add(mention.id)
-                    time.sleep(random.randint(60, 120))
-    except Exception as e:
-        print("❌ Error replying to mention:", e)
+# def reply_to_mentions():
+#     try:
+#         mentions = api.mentions_timeline(count=5)
+#         for mention in mentions:
+#             if mention.id not in REPLIED_IDS:
+#                 # 댓글이 처음 본 것이라면만 GPT 호출
+#                 reply_text = generate_gpt_reply(mention.user.screen_name, mention.text)
+#                 if reply_text:
+#                     api.update_status(
+#                         status=f"@{mention.user.screen_name} {reply_text}",
+#                         in_reply_to_status_id=mention.id
+#                     )
+#                     REPLIED_IDS.add(mention.id)
+#                     time.sleep(random.randint(60, 120))
+#     except Exception as e:
+#         print("❌ Error replying to mention:", e)
 
 # --- 오늘의 코인 요약 스레드 자동 포스팅 ---
 def post_daily_thread():
@@ -150,5 +157,5 @@ if __name__ == "__main__":
         now = datetime.now(korea)
         if now.hour == 12 or now.hour == 18:  # 점심 & 퇴근 시간대 업로드
             post_daily_thread()
-        reply_to_mentions()
+        # reply_to_mentions()
         time.sleep(600)  # 10분 간격 실행
