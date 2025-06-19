@@ -87,17 +87,18 @@ def reply_to_mentions():
     try:
         mentions = api.mentions_timeline(count=5)
         for mention in mentions:
-            if mention.id in REPLIED_IDS:
-                continue
-            print(f"💬 댓글 발견: @{mention.user.screen_name}: {mention.text}")
-            reply_text = generate_gpt_reply(mention.user.screen_name, mention.text)
-            if reply_text:
-                api.update_status(status=f"@{mention.user.screen_name} {reply_text}", in_reply_to_status_id=mention.id)
-                REPLIED_IDS.add(mention.id)
-                print("✅ GPT 답변 완료:", reply_text)
-                time.sleep(random.randint(60, 180))
+            if mention.id not in REPLIED_IDS:
+                # 댓글이 처음 본 것이라면만 GPT 호출
+                reply_text = generate_gpt_reply(mention.user.screen_name, mention.text)
+                if reply_text:
+                    api.update_status(
+                        status=f"@{mention.user.screen_name} {reply_text}",
+                        in_reply_to_status_id=mention.id
+                    )
+                    REPLIED_IDS.add(mention.id)
+                    time.sleep(random.randint(60, 120))
     except Exception as e:
-        print("❌ 답변 중 오류:", e)
+        print("❌ Error replying to mention:", e)
 
 # --- 오늘의 코인 요약 스레드 자동 포스팅 ---
 def post_daily_thread():
