@@ -9,7 +9,7 @@ pip install --upgrade pip
 pip install openai tweepy python-dotenv pytz
 
 echo "✅ Creating .env template file..."
-cat <<EOT > .env
+cat <<EOT > .envz
 OPENAI_API_KEY=your_openai_key_here
 TW_API_KEY=your_twitter_api_key
 TW_API_SECRET=your_twitter_api_secret
