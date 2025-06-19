@@ -11,7 +11,7 @@ import os
 load_dotenv()
 
 # --- OpenAI API 키 설정 ---
-OPENAI_API_KEY = "여기에_입력"
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # --- X API 키 설정 ---
 TW_API_KEY = os.getenv("TW_API_KEY")
