@@ -102,7 +102,24 @@ def reply_to_mentions():
 # --- 오늘의 코인 요약 스레드 자동 포스팅 ---
 def post_daily_thread():
     today = datetime.now(korea).strftime("%Y년 %m월 %d일")
-    prompt = f"오늘 날짜는 {today}이야. 비트코인, 이더리움 등 주요 암호화폐의 트렌드, 가격 동향, 시장 이슈를 요약해서 한글 트위터 스레드 형식으로 작성해줘. 각 트윗은 250자 내외로, 총 3~5개 정도로 구성. 마지막에는 항상 '투자는 각자 책임이니까~🤭'도 넣어줘."
+    binanceLink = "https://www.binance.com/activity/referral-entry/CPA?ref=CPA_00VKZPQ0DA"
+    binanceCode = "CPA_00VKZPQ0DA"
+    prompt = f"""
+    오늘 날짜는 {today}이야. 비트코인, 이더리움 등 주요 암호화폐의 트렌드, 가격 동향, 시장 이슈를 요약해서 **한글 트위터 스레드 형식으로** 작성해줘.
+
+    조건은 다음과 같아:
+
+    1. 각 트윗은 250자 내외로.
+    2. 총 3~5개의 트윗으로 구성할 것.
+    3. 말투는 친근하고 자연스럽게.
+    4. 마지막 트윗에는 반드시 아래 2가지 항목을 포함할 것:
+    - 문구: "투자는 각자 책임이니까~🤭"
+    - 내 바이낸스 레퍼럴 링크와 코드:
+        - 링크: {binanceLink}
+        - 코드: {binanceCode}
+
+    절대 이 마지막 두 항목을 빠뜨리지 말고 항상 포함해줘!
+    """
 
     try:
         response = openai.ChatCompletion.create(
