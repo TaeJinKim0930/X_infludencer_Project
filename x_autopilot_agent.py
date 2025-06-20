@@ -1,5 +1,5 @@
 # X Autopilot Agent: GPT 기반 암호화폐 트위터 인플루언서 자동화
-import openai
+from openai import OpenAI
 import tweepy
 import time
 import random
@@ -14,6 +14,7 @@ load_dotenv()
 
 # --- OpenAI API Key Setting ---
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+openClient = OpenAI(api_key=OPENAI_API_KEY)
 
 # --- X OAuth2 Authentication Info ---
 CLIENT_ID = os.getenv("TW_CLIENT_ID")
@@ -68,13 +69,14 @@ def generate_gpt_reply(user_id, comment):
     style = random.choice(["info", "empathy", "humor"])
     prompt = make_prompt_style(style, user_id, comment)
     try:
-        response = openai.ChatCompletion.create(
+        response = openClient.chat.completions.create(
             model="gpt-4o",
             messages=[
-                {"role": "system", "content": "너는 코인 트위터 인플루언서로 활동하고 있어. 팔로워들과 친근하게 소통해."},
-                {"role": "user", "content": prompt}
+                {"role": "system", "content": "너는 ..."},
+                {"role": "user", "content": "..." }
             ]
         )
+        
         reply = response.choices[0].message.content.strip()
         # CTA 유도 문장 추가
         cta = random.choice([
