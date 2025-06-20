@@ -76,15 +76,15 @@ def generate_gpt_reply(user_id, comment):
                 {"role": "user", "content": "..." }
             ]
         )
-        
+
         reply = response.choices[0].message.content.strip()
         # CTA 유도 문장 추가
-        cta = random.choice([
-            "리트윗 하면 운 좋아질지도?💸",
-            "비슷한 얘기 오늘 올렸어. 타임라인 구경 ㄱ",
-            "정보 도움됐으면 팔로우도 부탁~🔥"
-        ])
-        return f"{reply}\n\n{cta}"
+        # cta = random.choice([
+        #     "리트윗 하면 운 좋아질지도?💸",
+        #     "비슷한 얘기 오늘 올렸어. 타임라인 구경 ㄱ",
+        #     "정보 도움됐으면 팔로우도 부탁~🔥"
+        # ])
+        return reply
     except Exception as e:
         print("GPT 호출 오류:", e)
         return None
@@ -132,7 +132,7 @@ def post_daily_thread():
     """
 
     try:
-        response = openai.ChatCompletion.create(
+        response = openClient.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": "암호화폐 시장 분석을 요약해서 트위터용 스레드로 작성해줘."},
